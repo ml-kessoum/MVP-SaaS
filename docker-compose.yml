@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   postgres:
@@ -47,8 +46,10 @@ services:
     build: ./backend
     container_name: ${COMPOSE_PROJECT_NAME}_${ENV}_backend
     restart: unless-stopped
+    command: npm run start
     ports:
-      - "4000:4000"
+      - "4000:3000"
+      - "4100:3000"
     environment:
       NODE_ENV: ${ENV}
       DEBUG: ${DEBUG}
@@ -70,6 +71,7 @@ services:
       EMAIL_USE_TLS: ${EMAIL_USE_TLS}
     volumes:
       - ./backend:/app
+      - /app/node_modules
       - jt-media:/app/media
     depends_on:
       - postgres
@@ -82,12 +84,15 @@ services:
     build: ./frontend
     container_name: ${COMPOSE_PROJECT_NAME}_${ENV}_frontend
     restart: unless-stopped
+    command: ng serve core --host 0.0.0.0
     ports:
       - "4200:4200"
     environment:
       NODE_ENV: ${ENV}
     volumes:
       - ./frontend:/app
+      - /app/node_modules
+
     depends_on:
       - back
     networks:
@@ -99,7 +104,7 @@ services:
     restart: unless-stopped
     ports:
       - "1025:1025"  # SMTP server
-      - "8025:8025"  # Web UI: http://127.0.0.1:8025
+      - "4300:8025"  # Web UI: http://127.0.0.1:8025
     networks:
       - jt-network
 
